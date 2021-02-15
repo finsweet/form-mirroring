@@ -1,9 +1,9 @@
-import { handleMarketoForm } from './marketo/index';
+import { formMirroring } from '.';
 
 declare global {
   interface Window {
     MktoForms2: any;
-    handleMarketoForm: typeof handleMarketoForm;
+    formMirroring: typeof formMirroring;
   }
 }
 
