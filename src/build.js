@@ -1,4 +1,4 @@
-const esbuild = require('esbuild');
+const esbuild = require('esbuild'); // eslint-disable-line
 
 esbuild.buildSync({
   entryPoints: ['index.ts'],

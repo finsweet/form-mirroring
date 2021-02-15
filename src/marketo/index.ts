@@ -1,5 +1,5 @@
-import { isFormField } from './helpers';
-import { FormField } from './types';
+import { isFormField } from '../helpers';
+import { FormField } from '../types';
 
 export const handleMarketoForm = (marketoFormObject: any) => {
   // DOM Elements

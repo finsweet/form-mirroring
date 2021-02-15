@@ -1,4 +1,4 @@
-import { handleMarketoForm } from '.';
+import { handleMarketoForm } from './marketo/index';
 
 declare global {
   interface Window {
