@@ -6,5 +6,5 @@ esbuild.buildSync({
   minify: true,
   sourcemap: false,
   target: ['es6'],
-  outfile: '../../Users/alexi/OneDrive/Espai de Treball/Finsweet/FormMirroring/index.js',
+  outfile: 'dist/index.js',
 });
