@@ -1,7 +1,9 @@
-import { handleMarketoForm } from './marketo/marketo';
+import marketo from './marketo/marketo';
+import mailchimp from './mailchimp/mailchimp';
 
 export const formMirroring = {
-  marketo: handleMarketoForm,
+  marketo,
+  mailchimp,
 };
 
 window.formMirroring = formMirroring;
