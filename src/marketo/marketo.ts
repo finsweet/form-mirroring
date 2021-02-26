@@ -2,7 +2,7 @@ import { isFormField } from '../helpers';
 import { FormField } from '../types';
 import { MarketoFormObject } from './types';
 
-export const handleMarketoForm = (marketoFormObject: MarketoFormObject): void => {
+const handleMarketoForm = (marketoFormObject: MarketoFormObject): void => {
   // DOM Elements
   const marketoForm = marketoFormObject.getFormElem()[0];
   const webflowForm = document.querySelector<HTMLFormElement>(`[data-marketo-id="${marketoFormObject.getId()}"]`);
@@ -68,3 +68,5 @@ export const handleMarketoForm = (marketoFormObject: MarketoFormObject): void =>
   webflowForm.addEventListener('input', handleInput);
   webflowForm.addEventListener('submit', handleWebflowSubmit);
 };
+
+export default handleMarketoForm;
