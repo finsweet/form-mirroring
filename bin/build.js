@@ -12,6 +12,12 @@ const defaultSettings = {
 // Files building
 buildSync({
   ...defaultSettings,
+  entryPoints: ['src/index.ts'],
+  outfile: 'dist/index.js',
+});
+
+buildSync({
+  ...defaultSettings,
   entryPoints: ['src/marketo/marketo.ts'],
   outfile: 'dist/marketo.js',
 });
