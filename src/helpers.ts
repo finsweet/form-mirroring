@@ -13,6 +13,15 @@ export const isFormField = (element: Element | EventTarget | null): element is F
 };
 
 /**
+ * @param element
+ * @returns The form fields in the element
+ */
+export const getFormFields = (element: Element): FormField[] => {
+  if (isFormField(element)) return [element];
+  else return [...element.querySelectorAll<FormField>('input, select, textarea')];
+};
+
+/**
  * Sync the values of two form fields
  * @param origin
  * @param target
@@ -31,4 +40,13 @@ export const syncFormFieldValues = (origin: FormField, target: FormField): void 
     default:
       target.value = origin.value;
   }
+};
+
+/**
+ * Clear the value of an input
+ * @param target - Element that has to be cleared
+ */
+export const clearInput = (target: FormField): void => {
+  if (target.type === 'checkbox' || target.type === 'radio') (<HTMLInputElement>target).checked = false;
+  else target.value = '';
 };
