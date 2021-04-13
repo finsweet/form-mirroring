@@ -3,7 +3,7 @@ import { formMirroring } from '.';
 declare global {
   interface Window {
     MktoForms2: any;
-    formMirroring: typeof formMirroring;
+    formMirroring: Partial<typeof formMirroring>;
   }
 }
 
