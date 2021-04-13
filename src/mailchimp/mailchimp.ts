@@ -47,3 +47,4 @@ const handleMailchimpForm = (webflowFormSelector: string): void => {
 };
 
 export default handleMailchimpForm;
+window.formMirroring = { mailchimp: handleMailchimpForm };

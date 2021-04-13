@@ -73,3 +73,4 @@ const handleMarketoForm = (marketoFormObject: MarketoFormObject): void => {
 };
 
 export default handleMarketoForm;
+window.formMirroring = { marketo: handleMarketoForm };
