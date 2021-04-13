@@ -1,6 +1,6 @@
+import { MarketoFormObject } from './types';
 import { isFormField } from '../helpers';
 import { FormField } from '../types';
-import { MarketoFormObject } from './types';
 
 const handleMarketoForm = (marketoFormObject: MarketoFormObject): void => {
   // DOM Elements
@@ -39,12 +39,15 @@ const handleMarketoForm = (marketoFormObject: MarketoFormObject): void => {
           (marketoTarget.type !== 'checkbox' && marketoTarget.type !== 'radio')
         )
           break;
+
         marketoTarget.checked = (<HTMLInputElement>webflowTarget).checked;
         break;
 
       default:
         marketoTarget.value = webflowTarget.value;
     }
+
+    marketoTarget.dispatchEvent(new Event('change', { bubbles: true }));
   };
 
   const displayWebflowError = () => {
