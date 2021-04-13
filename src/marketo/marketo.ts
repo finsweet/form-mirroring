@@ -1,6 +1,8 @@
 import { MarketoFormObject } from './types';
-import { isFormField } from '../helpers';
+import { clearInput, getFormFields, isFormField } from '../helpers';
 import { FormField } from '../types';
+
+type FieldsRelation = { webflowField: FormField; marketoField: FormField };
 
 const handleMarketoForm = (marketoFormObject: MarketoFormObject): void => {
   // DOM Elements
@@ -10,7 +12,7 @@ const handleMarketoForm = (marketoFormObject: MarketoFormObject): void => {
   const webflowError = webflowForm.querySelector<HTMLDivElement>('.w-form-fail');
 
   // Variables
-  const formFields: Map<FormField, FormField> = new Map();
+  const fieldsRelationStore: FieldsRelation[] = [];
 
   // Functions
   const handleFields = () => {
@@ -20,34 +22,90 @@ const handleMarketoForm = (marketoFormObject: MarketoFormObject): void => {
       const marketoField = marketoForm.querySelector<FormField>(`#${webflowField.dataset.marketoId}`);
       if (!marketoField) continue;
       if (marketoField.type !== webflowField.type) webflowField.setAttribute('type', marketoField.type);
-      formFields.set(webflowField, marketoField);
+      fieldsRelationStore.push({ webflowField, marketoField });
     }
   };
 
+  const getRelatedField = <T extends keyof FieldsRelation>(targetKey: T, originField: FormField) => {
+    const originKey = targetKey === 'webflowField' ? 'marketoField' : 'webflowField';
+
+    const fieldsRelation = fieldsRelationStore.find((fields) => fields[originKey] === originField);
+    if (fieldsRelation) return fieldsRelation[targetKey];
+  };
+
+  /**
+   * Check if any new FormField has been dynamically added to the step
+   */
+  const observeChildList = () => {
+    // Create callback
+    const callback: MutationCallback = (mutations) => {
+      for (const mutation of mutations) {
+        // If new form fields are added, store them
+        for (const node of mutation.addedNodes) {
+          if (!(node instanceof Element)) continue;
+
+          const marketoFields = getFormFields(node);
+          if (!marketoFields.length) continue;
+
+          for (const marketoField of marketoFields) {
+            const marketoId = marketoField.id;
+            const webflowField = webflowForm.querySelector<FormField>(`[data-marketo-id="${marketoId}"]`);
+            if (webflowField) fieldsRelationStore.push({ webflowField, marketoField });
+          }
+        }
+
+        // If any form field is removed, remove it from the stored records
+        for (const node of mutation.removedNodes) {
+          if (!(node instanceof Element)) continue;
+
+          const marketoFields = getFormFields(node);
+          if (!marketoFields.length) continue;
+
+          for (const marketoField of marketoFields) {
+            const webflowField = getRelatedField('webflowField', marketoField);
+            if (!webflowField) continue;
+
+            clearInput(webflowField);
+            fieldsRelationStore.filter((fieldsRelation) => fieldsRelation.webflowField !== webflowField);
+          }
+        }
+      }
+    };
+
+    // Init observer
+    const observer = new MutationObserver(callback);
+    observer.observe(marketoForm, {
+      subtree: true,
+      childList: true,
+    });
+  };
+
   const handleInput = (e: Event) => {
-    const webflowTarget = e.target;
+    const webflowField = e.target;
 
-    if (!isFormField(webflowTarget)) return;
-    const marketoTarget = formFields.get(webflowTarget);
-    if (!marketoTarget) return;
+    if (!isFormField(webflowField)) return;
 
-    switch (webflowTarget.type) {
+    const marketoField = getRelatedField('marketoField', webflowField);
+    if (!marketoField) return;
+
+    switch (webflowField.type) {
       case 'checkbox':
       case 'radio':
         if (
-          !(marketoTarget instanceof HTMLInputElement) ||
-          (marketoTarget.type !== 'checkbox' && marketoTarget.type !== 'radio')
+          !(marketoField instanceof HTMLInputElement) ||
+          (marketoField.type !== 'checkbox' && marketoField.type !== 'radio')
         )
           break;
 
-        marketoTarget.checked = (<HTMLInputElement>webflowTarget).checked;
+        marketoField.checked = (<HTMLInputElement>webflowField).checked;
         break;
 
       default:
-        marketoTarget.value = webflowTarget.value;
+        marketoField.value = webflowField.value;
     }
 
-    marketoTarget.dispatchEvent(new Event('change', { bubbles: true }));
+    marketoField.dispatchEvent(new Event('input', { bubbles: true }));
+    marketoField.dispatchEvent(new Event('change', { bubbles: true }));
   };
 
   const displayWebflowError = () => {
@@ -68,6 +126,7 @@ const handleMarketoForm = (marketoFormObject: MarketoFormObject): void => {
 
   // Init
   handleFields();
+  observeChildList();
   webflowForm.addEventListener('input', handleInput);
   webflowForm.addEventListener('submit', handleWebflowSubmit);
 };
