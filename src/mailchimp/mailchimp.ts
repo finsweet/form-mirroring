@@ -33,7 +33,7 @@ const handleMailchimpForm = (webflowFormSelector: string): void => {
   }
 
   const handleInput = (e: Event) => {
-    const target = e.target;
+    const { target } = e;
     if (!isFormField(target)) return;
 
     const hiddenField = hiddenFieldsStore.get(target);
