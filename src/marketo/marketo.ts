@@ -122,6 +122,7 @@ const handleMarketoForm = (marketoFormObject: MarketoFormObject): void => {
     }
 
     marketoFormObject.submit();
+    marketoFormObject.reset();
   };
 
   // Init
